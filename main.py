@@ -83,6 +83,7 @@ def main():
     updater = Updater(TELEGRAM_BOT_API, use_context=True)
     dp = updater.dispatcher
 
+    # Conversation handler for user interactions
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
@@ -92,8 +93,15 @@ def main():
         fallbacks=[CommandHandler("start", start)],
     )
 
+    # Add conversation handler
     dp.add_handler(conv_handler)
 
+    # Add admin command handlers
+    dp.add_handler(CommandHandler("get_payments_list", get_payments_list))
+    dp.add_handler(CommandHandler("show_pending_payments", show_pending_payments))
+    dp.add_handler(CommandHandler("mark_as_paid", mark_as_paid))
+
+    # Start polling for updates
     updater.start_polling()
     updater.idle()
 
