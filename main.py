@@ -24,8 +24,9 @@ def handle_username(update: Update, context: CallbackContext):
     bot = context.bot
 
     try:
-        user = bot.get_chat(username)
-        chat_id = user.id
+        group_id = "-4561253163"
+        member = bot.get_chat_member(group_id, username)
+        chat_id = member.user.id
         print(f"Chat ID: {chat_id}")
         connection = connect_db()
         cursor = connection.cursor()
@@ -36,8 +37,8 @@ def handle_username(update: Update, context: CallbackContext):
         )
 
         # Check group membership
-        group_id = "-4561253163"  # Replace with your group ID
-        member = bot.get_chat_member(group_id, chat_id)
+          # is this id correct. does it change? is it immutable
+        #member = bot.get_chat_member(group_id, username)
         if member.status in ['member', 'administrator', 'creator']:
             cursor.execute("SELECT paid FROM users WHERE chat_id = %s", (chat_id,))
             result = cursor.fetchone()
