@@ -16,12 +16,17 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text("Hi. Welcome! To start, please provide the Telegram username of the account you joined the group with.")
 
 def handle_username(update: Update, context: CallbackContext):
-    username = update.message.text
+    username = update.message.text.strip()
+
+    if not username.startswith("@"):
+        username = f"@{username}"
+
     bot = context.bot
 
     try:
         user = bot.get_chat(username)
         chat_id = user.id
+        print(f"Chat ID: {chat_id}")
         connection = connect_db()
         cursor = connection.cursor()
 
@@ -31,7 +36,7 @@ def handle_username(update: Update, context: CallbackContext):
         )
 
         # Check group membership
-        group_id = "4561253163"  # Replace with your group ID
+        group_id = "-4561253163"  # Replace with your group ID
         member = bot.get_chat_member(group_id, chat_id)
         if member.status in ['member', 'administrator', 'creator']:
             cursor.execute("SELECT paid FROM users WHERE chat_id = %s", (chat_id,))
@@ -46,7 +51,8 @@ def handle_username(update: Update, context: CallbackContext):
             update.message.reply_text("You are not a member of the group. Join the group broski")
         connection.close()
     except Exception as e:
-        update.message.reply_text("Error: Invalid username or other issue.")  
+        update.message.reply_text(f"Error: {e}")  # Show error details for debugging
+    print(f"Exception: {e}") 
 
 
 def handle_account_details(update: Update, context: CallbackContext):
