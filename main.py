@@ -21,12 +21,14 @@ def handle_username(update: Update, context: CallbackContext):
     if not username.startswith("@"):
         username = f"@{username}"
 
+    user_id = update.effective_user.id    
+
     bot = context.bot
 
     try:
         group_id = "-4561253163"
-        member = bot.get_chat_member(group_id, username)
-        chat_id = member.user.id
+        member = bot.get_chat_member(group_id, user_id)
+        chat_id = user_id
         print(f"Chat ID: {chat_id}")
         connection = connect_db()
         cursor = connection.cursor()
@@ -36,8 +38,7 @@ def handle_username(update: Update, context: CallbackContext):
             (chat_id, username)
         )
 
-        # Check group membership
-          # is this id correct. does it change? is it immutable
+
         #member = bot.get_chat_member(group_id, username)
         if member.status in ['member', 'administrator', 'creator']:
             cursor.execute("SELECT paid FROM users WHERE chat_id = %s", (chat_id,))
