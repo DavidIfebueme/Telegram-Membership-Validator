@@ -2,7 +2,7 @@ from telegram import Update, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import psycopg2
 from db_connection import connect_db
-from admin import get_payments_list, mark_as_paid
+from admin import get_payments_list, mark_as_paid, show_pending_payments
 import os
 from dotenv import load_dotenv
 
@@ -10,6 +10,7 @@ load_dotenv()
 
 TELEGRAM_BOT_API = os.getenv("TELEGRAM_BOT_API")
 DATABASE_URL = os.getenv("DATABASE_URL")
+
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text("Hi. Welcome! To start, please provide the Telegram username of the account you joined the group with.")
@@ -69,10 +70,9 @@ def handle_account_details(update: Update, context: CallbackContext):
         update.message.reply_text("Something went wrong. Start again.")
 
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 def main():
-    updater = Updater("TELEGRAM_BOT_API", use_context=True)
+    updater = Updater(TELEGRAM_BOT_API, use_context=True)
     dp = updater.dispatcher
 
     # Command to start the bot

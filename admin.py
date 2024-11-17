@@ -18,19 +18,7 @@ def get_payments_list(update: Update, context: CallbackContext):
             update.message.reply_text("No pending payments.")
     else:
         update.message.reply_text("You're not David!'")
-
-def mark_as_paid(update: Update, context: CallbackContext):
-    try:
-        chat_id = int(context.args[0])
-        connection = connect_db()
-        cursor = connection.cursor()
-        
-        cursor.execute("UPDATE users SET paid = TRUE WHERE chat_id = %s", (chat_id,))
-        connection.commit()
-        connection.close()
-        update.message.reply_text(f"User {chat_id} marked as paid.")
-    except Exception as e:
-        update.message.reply_text("Error: Provide a valid chat ID.")    
+  
 
 def show_pending_payments(update: Update, context: CallbackContext):
     # Ensure only the bot owner can use this command
