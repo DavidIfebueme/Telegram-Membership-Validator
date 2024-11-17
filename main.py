@@ -40,15 +40,17 @@ def handle_username(update: Update, context: CallbackContext):
 
 
         #member = bot.get_chat_member(group_id, username)
-        if member.status in ['member', 'administrator', 'creator']:
+        if member.status in ['member', 'administrator', 'creator']: # i now see that this kinda makes asking for the username useless. cos the bot just uses the id of the current user interacting with it. need to implement better logic later
             cursor.execute("SELECT paid FROM users WHERE chat_id = %s", (chat_id,))
             result = cursor.fetchone()
 
             if result and not result[0]:
                 update.message.reply_text("Nice! Thanks for joining the group. Please provide your account details.")
                 context.user_data['chat_id'] = chat_id
+                context.user_data['awaiting_account_details'] = True 
             else:
                 update.message.reply_text("You've been paid already or you're not eligible.")
+                context.user_data['awaiting_account_details'] = False 
         else:
             update.message.reply_text("You are not a member of the group. Join the group broski")
         connection.close()
@@ -58,25 +60,29 @@ def handle_username(update: Update, context: CallbackContext):
 
 
 def handle_account_details(update: Update, context: CallbackContext):
-    account_details = update.message.text
-    chat_id = context.user_data.get('chat_id')
+    # Only handle account details if the bot is in the correct state
+    if context.user_data.get('awaiting_account_details'):
+        account_details = update.message.text
+        chat_id = context.user_data.get('chat_id')
 
-    if chat_id:
-        connection = connect_db()
-        cursor = connection.cursor()
-        
-        # Insert into payments_list, ensuring no duplicates
-        cursor.execute(
-            "INSERT INTO payments_list (chat_id, account_details) VALUES (%s, %s) ON CONFLICT (chat_id) DO NOTHING",
-            (chat_id, account_details)
-        )
-        connection.commit()
-        connection.close()
-        
-        update.message.reply_text("You have been added to the payments list. You'll receive payment soon.")
+        if chat_id:
+            connection = connect_db()
+            cursor = connection.cursor()
+            
+            # Insert into payments_list, ensuring no duplicates
+            cursor.execute(
+                "INSERT INTO payments_list (chat_id, account_details) VALUES (%s, %s) ON CONFLICT (chat_id) DO NOTHING",
+                (chat_id, account_details)
+            )
+            connection.commit()
+            connection.close()
+            
+            update.message.reply_text("You have been added to the payments list. You'll receive payment soon.")
+            context.user_data['awaiting_account_details'] = False  # Reset the state flag
+        else:
+            update.message.reply_text("Something went wrong. Start again.")
     else:
-        update.message.reply_text("Something went wrong. Start again.")
-
+        update.message.reply_text("Please start the process by providing your username.")
 
 
 def main():
