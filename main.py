@@ -80,11 +80,14 @@ def handle_account_details(update: Update, context: CallbackContext):
     return ConversationHandler.END
 
 def respond_to_creator(update: Update, context: CallbackContext): 
-    creator_id = 6333448623 
+    creator_id = 6333448623  
     message = update.message
 
-    if message.from_user.id == creator_id and "nice" in message.text.lower() and f"@{context.bot.username}" in message.text:
-        message.reply_text("Thanks my overlord and creator", parse_mode=ParseMode.MARKDOWN)
+    if message.from_user.id == creator_id:
+        bot_username = context.bot.username
+        if "nice" in message.text.lower() and f"@{bot_username}" in message.text:
+            message.reply_text("Thanks my overlord and creator", parse_mode=ParseMode.MARKDOWN)
+
 
 def main():
     updater = Updater(TELEGRAM_BOT_API, use_context=True)
