@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 import psycopg2
 from db_connection import connect_db
 from admin import get_payments_list, mark_as_paid, show_pending_payments
-from new_group_handler import add_members_to_db
+from new_group_handler import handle_bot_added
 import os
 from dotenv import load_dotenv
 
@@ -101,7 +101,7 @@ def main():
     dp.add_handler(CommandHandler("get_payments_list", get_payments_list))
     dp.add_handler(CommandHandler("show_pending_payments", show_pending_payments))
     dp.add_handler(CommandHandler("mark_as_paid", mark_as_paid))
-    dp.add_handler(ChatMemberHandler(add_members_to_db, ChatMemberHandler.MY_CHAT_MEMBER))
+    dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, handle_bot_added))
 
 
     # Start polling for updates
