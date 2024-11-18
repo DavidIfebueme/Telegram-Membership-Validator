@@ -29,7 +29,7 @@ def handle_bot_added(update: Update, context: CallbackContext):
             # Notify success
             context.bot.send_message(
                 chat_id=chat.id,
-                text=f"Successfully added {members_added} existing members with to the database."
+                text=f"Successfully added {members_added} existing members to the database."
             )
         except Exception as e:
             context.bot.send_message(chat_id=chat.id, text=f"Error syncing members: {e}")

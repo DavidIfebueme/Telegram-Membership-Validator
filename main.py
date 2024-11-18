@@ -1,4 +1,4 @@
-from telegram import Update, Bot
+from telegram import Update, Bot, ParseMode
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 import psycopg2
 from db_connection import connect_db
@@ -79,6 +79,12 @@ def handle_account_details(update: Update, context: CallbackContext):
         update.message.reply_text("Something went wrong. Start again.")
     return ConversationHandler.END
 
+def respond_to_creator(update: Update, context: CallbackContext): 
+    creator_id = 6333448623 
+    message = update.message
+
+    if message.from_user.id == creator_id and "nice" in message.text.lower() and f"@{context.bot.username}" in message.text:
+        message.reply_text("Thanks my overlord and creator", parse_mode=ParseMode.MARKDOWN)
 
 def main():
     updater = Updater(TELEGRAM_BOT_API, use_context=True)
@@ -102,6 +108,8 @@ def main():
     dp.add_handler(CommandHandler("show_pending_payments", show_pending_payments))
     dp.add_handler(CommandHandler("mark_as_paid", mark_as_paid))
     dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, handle_bot_added))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, respond_to_creator))
+
 
 
     # Start polling for updates
